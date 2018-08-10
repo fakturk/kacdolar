@@ -5,10 +5,13 @@ import (
     "net/http"
     "log"
     "strconv"
+    "encoding/json"
+	  "io/ioutil"
+    "fmt"
 
 )
 
-type doviz []struct {
+type Doviz []struct {
 	Selling    float64 `json:"selling"`
 	UpdateDate int     `json:"update_date"`
 	Currency   int     `json:"currency"`
@@ -48,6 +51,17 @@ func getAsgari() (asgari float64)  {
 }
 
 func getDolar() (dolar float64) {
-  dolar = 6.46
+
+    res, _ := http.Get("https://www.doviz.com/api/v1/currencies/all/latest")
+
+  	temp, _ := ioutil.ReadAll(res.Body)
+
+  	var doviz Doviz
+  	err := json.Unmarshal(temp, &doviz)
+  	if err != nil {
+  		fmt.Println("There was an error:", err)
+  	}
+  dolar = doviz[0].Selling
+
   return
 }
