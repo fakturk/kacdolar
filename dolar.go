@@ -8,6 +8,8 @@ import (
     "encoding/json"
 	  "io/ioutil"
     "fmt"
+    "strings"
+    "github.com/PuerkitoBio/goquery"
 
 )
 
@@ -46,7 +48,8 @@ func dolarHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAsgari() (asgari float64)  {
-  asgari=1725.08
+  // asgari=1725.08
+  asgari = postScrape()
   return
 }
 
@@ -63,5 +66,36 @@ func getDolar() (dolar float64) {
   	}
   dolar = doviz[0].Selling
 
+  return
+}
+func postScrape() (asgari float64) {
+  doc,err := goquery.NewDocument("https://www.csgb.gov.tr/home/contents/istatistikler/asgariucret/")
+  if err != nil {
+    log.Fatal(err)
+  }
+  //use CSS selector found with the browser inspector
+  //for each, use index and item
+  // doc.Find("wrapper").Find(".container").Find(".row").Find(".asgariUcretTablosu").Find("tbody").Find("tr").Find("td")
+  doc.Find(".asgariUcretTablosu").Each(func(i int,s *goquery.Selection){
+
+    if i==0{
+      splitted:=strings.Split( s.Text()," ")
+      for i := range splitted {
+    	  splitted[i] = strings.TrimSpace(splitted[i])
+    	}
+      last:= splitted[len(splitted)-1]
+      println(last)
+      // bu kismi turkce formattan ingilizce sayi formatina cevirmek icin
+      last = strings.Replace(last, ".", "", -1)
+      last = strings.Replace(last, ",", ".", -1)
+      println(last)
+      asgari,err =strconv.ParseFloat(last,64)
+      if err!=nil {
+        fmt.Println("asgari ucret bulunamadi")
+      }
+
+    }
+
+  })
   return
 }
