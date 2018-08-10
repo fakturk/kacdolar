@@ -8,6 +8,17 @@ import (
 
 )
 
+type doviz []struct {
+	Selling    float64 `json:"selling"`
+	UpdateDate int     `json:"update_date"`
+	Currency   int     `json:"currency"`
+	Buying     float64 `json:"buying"`
+	ChangeRate float64 `json:"change_rate"`
+	Name       string  `json:"name"`
+	FullName   string  `json:"full_name"`
+	Code       string  `json:"code"`
+}
+
 func main()  {
   router := mux.NewRouter()
   router.HandleFunc("/", dolarHandler)
